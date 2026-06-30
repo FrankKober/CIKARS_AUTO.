@@ -52,26 +52,13 @@ export class CarsService {
 
     // Fetching all relevant fields including the 'images' array
     return this.prisma.car.findMany({
-      where: {
-        make: make ? { equals: make, mode: 'insensitive' } : undefined,
-        model: model ? { equals: model, mode: 'insensitive' } : undefined,
-        location: location ? { equals: location, mode: 'insensitive' } : undefined,
-        price: {
-          gte: minPrice ? Number(minPrice) : undefined,
-          lte: maxPrice ? Number(maxPrice) : undefined,
-        },
-      },
-      include: {
-        intelligence: true,
-        seller: {
-          select: { name: true, email: true, verified: true },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-  }
+    include: {
+      seller: { select: { name: true, verified: true } },
+      intelligence: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+}
 
   async findOne(id: string) {
     const car = await this.prisma.car.findUnique({

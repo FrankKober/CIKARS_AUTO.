@@ -16,6 +16,10 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
 
   const data = await response.json();
 
+  if (response.status === 401) {
+    throw new Error('Unauthorized: Please log in again.');
+  }
+
   if (!response.ok) {
     throw new Error(data.message || 'Something went wrong');
   }

@@ -2,22 +2,33 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
-  // Check for token on mount
+  // Check for token on mount and route changes
   useEffect(() => {
+    // Check for the token key used in your login flow
     const token = localStorage.getItem('token');
     setIsAuthenticated(!!token);
-  }, [pathname]); // Re-run when route changes
+  }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
-    window.location.href = '/';
+    router.push('/');
+  };
+
+  const handleSellClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      router.push('/sell');
+    } else {
+      router.push('/auth');
+    }
   };
 
   return (
@@ -30,9 +41,14 @@ export default function Navbar() {
         <Link href="/cars" className="hover:text-white transition">
           Browse Cars
         </Link>
-        <Link href="/sell" className="hover:text-white transition">
+        
+        {/* Guarded Sell Car Button */}
+        <button 
+          onClick={handleSellClick} 
+          className="hover:text-white transition cursor-pointer bg-transparent border-none p-0"
+        >
           Sell Car
-        </Link>
+        </button>
         
         {isAuthenticated ? (
           <div className="flex items-center gap-6">
@@ -56,7 +72,6 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* Mobile Menu Button (Placeholder for future expansion) */}
       <button className="md:hidden text-white">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />

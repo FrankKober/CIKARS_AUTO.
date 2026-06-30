@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiRequest } from '../lib/api';
 
 export default function SellCarPage() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     make: '', model: '', year: '', price: '', mileage: '', 
@@ -26,9 +28,25 @@ export default function SellCarPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // Retrieve token for the authorized request
+    const authData = localStorage.getItem('tasky-auth');
+    const token = authData ? JSON.parse(authData).token : null;
+
     try {
-      await apiRequest('/cars', { method: 'POST', body: JSON.stringify(formData) });
-      setSuccess(true);
+      await apiRequest('/cars', { 
+        method: 'POST', 
+        body: JSON.stringify(formData),
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      setToast('Listing successfully published!');
+      
+      // Redirect to Browse Cars page after 2 seconds
+      setTimeout(() => {
+        router.push('/cars');
+      }, 2000);
+
     } catch (err: any) {
       setError(err.message || 'Failed to publish listing.');
     } finally {
@@ -38,6 +56,13 @@ export default function SellCarPage() {
 
   return (
     <main className="min-h-screen bg-black px-6 py-16 flex flex-col items-center">
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed top-20 right-10 bg-emerald-500 text-black px-6 py-3 rounded-xl font-bold shadow-2xl z-50 animate-bounce">
+          {toast}
+        </div>
+      )}
+
       <div className="w-full max-w-xl">
         {/* Progress Timeline */}
         <div className="flex justify-between mb-12">
@@ -54,6 +79,8 @@ export default function SellCarPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="bg-neutral-900/40 border border-neutral-800 rounded-3xl p-8 backdrop-blur-sm">
+          {error && <div className="mb-6 p-4 bg-red-900/20 border border-red-800 text-red-400 rounded-xl text-sm">{error}</div>}
+
           {step === 1 && (
             <div className="space-y-4">
               <h3 className="text-2xl font-bold mb-6">Core Metrics</h3>
@@ -89,7 +116,7 @@ export default function SellCarPage() {
           {step === 4 && (
             <div className="space-y-4">
               <h3 className="text-2xl font-bold mb-6">Final Overview</h3>
-              <textarea name="description" required rows={6} placeholder="Describe the vehicle condition, history, and key features for our AI analyzer..." value={formData.description} onChange={handleChange} className="w-full p-4 bg-neutral-950 border border-neutral-800 rounded-xl outline-none focus:border-white transition resize-none" />
+              <textarea name="description" required rows={6} placeholder="Describe the vehicle condition, history, and key features..." value={formData.description} onChange={handleChange} className="w-full p-4 bg-neutral-950 border border-neutral-800 rounded-xl outline-none focus:border-white transition resize-none" />
             </div>
           )}
 
