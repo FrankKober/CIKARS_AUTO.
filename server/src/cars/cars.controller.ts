@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Req, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { CarsService } from './cars.service.js';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 
@@ -18,13 +19,25 @@ export class CarsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async createCar(@Body() body: any, @Req() req: any) {
-    // req.user is populated dynamically by the JwtStrategy validation step
-    return this.carsService.create(body, req.user.id);
+  @UseInterceptors(FilesInterceptor('images', 10)) // Allows up to 10 files
+  async createCar(
+    @UploadedFiles() files: any[], 
+    @Body() body: any, 
+    @Req() req: any
+  ) {
+    // Convert file objects into a list of paths or URLs
+    // Note: If you use a cloud provider like S3, replace this with the actual URL
+    const imageUrls = files.map(file => `/uploads/${file.filename}`);
+    
+    // Merge the image URLs with the other form data
+    const carData = { ...body, images: imageUrls };
+    
+    return this.carsService.create(carData, req.user.id);
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
+  // Optional: Add Interceptor here if you want to allow updating images
   async updateCar(@Param('id') id: string, @Body() body: any, @Req() req: any) {
     return this.carsService.update(id, body, req.user.id);
   }
