@@ -7,7 +7,7 @@ import Navbar from "./components/Navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CIKARSAUTO | Next-Gen AI Car Marketplace",
+  title: "CIKARSAUTO ",
   description: "Buy and sell cars with confidence using AI-verified pricing and smart recommendations.",
 };
 

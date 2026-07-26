@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { apiRequest } from '../../lib/api';
 import Image from 'next/image';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://cikars-auto.onrender.com';
 
 interface Car {
   id: string;

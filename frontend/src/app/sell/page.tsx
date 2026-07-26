@@ -107,7 +107,7 @@ export default function SellCarPage() {
     files.forEach((file) => data.append('images', file));
 
     try {
-      const response = await fetch('http://localhost:3001/cars', {
+      const response = await fetch('https://cikars-auto.onrender.com/cars', {
         method: 'POST',
         body: data,
         headers: { 

@@ -37,9 +37,9 @@ export default function ContactPage() {
   };
 
   const offices = [
-    { city: 'New York', address: '350 Fifth Avenue, Suite 4200', phone: '+1 (212) 555-0147' },
-    { city: 'London', address: '1 Canada Square, Canary Wharf', phone: '+44 20 7946 0958' },
-    { city: 'Dubai', address: 'Burj Khalifa Blvd, Downtown Dubai', phone: '+971 4 123 4567' },
+    { city: 'Nairobi', address: '350 Fifth Avenue, Suite 4200', phone: '+254 794603876' },
+    { city: 'Mombasa', address: '1 Square, Canary Wharf', phone: '+254 794603876' },
+    { city: 'Kisumu', address: 'Burj Khalifa Blvd', phone: '+254 794603876' },
   ];
 
   return (
@@ -73,11 +73,11 @@ export default function ContactPage() {
                 <div className="space-y-5">
                   <div>
                     <p className="text-neutral-500 text-sm mb-1">Email</p>
-                    <Link href="mailto:hello@cikars.com" className="text-white hover:text-neutral-300 transition">hello@cikars.com</Link>
+                    <Link href="mailto:franklinekpober@gmail.com" className="text-white hover:text-neutral-300 transition">franklinekpober@gmail.com</Link>
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm mb-1">Phone</p>
-                    <Link href="tel:+18001234567" className="text-white hover:text-neutral-300 transition">+1 (800) 123-4567</Link>
+                    <Link href="tel:+254794603876" className="text-white hover:text-neutral-300 transition">+254 794 603 876</Link>
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm mb-1">Support Hours</p>
@@ -105,8 +105,8 @@ export default function ContactPage() {
                 <p className="text-neutral-400 text-sm leading-relaxed mb-4">
                   For media requests, brand partnerships, and press kits.
                 </p>
-                <Link href="mailto:press@cikars.com" className="text-white font-medium hover:underline">
-                  press@cikars.com
+                <Link href="mailto:franklinekober@gmail.com" className="text-white font-medium hover:underline">
+                  franklinekober@gmail.com
                 </Link>
               </div>
             </div>
