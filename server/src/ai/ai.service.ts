@@ -1,20 +1,73 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { OpenAI } from 'openai';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class AiService {
-  private openai: OpenAI;
+  private readonly logger = new Logger(AiService.name);
+  private openai: OpenAI | null = null;
 
   constructor(private prisma: PrismaService) {
-    // Initializes the OpenAI SDK with the key from your .env file
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (apiKey) {
+      this.openai = new OpenAI({ apiKey });
+    } else {
+      this.logger.warn('OPENAI_API_KEY not set. AI analysis will return fallback data.');
+    }
   }
 
+  /**
+   * Helper method matching direct raw data generation if needed elsewhere
+   */
+  async generateCarIntelligence(carData: {
+    make: string;
+    model: string;
+    year: number;
+    price: number;
+    mileage: number;
+    location: string;
+    description?: string;
+  }) {
+    if (!this.openai) {
+      throw new Error("OPENAI_API_KEY is not configured.");
+    }
+
+    const prompt = `
+      Analyze the following car listing and output a strict JSON object (no markdown formatting outside JSON):
+      - Car: ${carData.year} ${carData.make} ${carData.model}
+      - Listed Price: KES ${carData.price}
+      - Mileage: ${carData.mileage} km
+      - Location: ${carData.location}
+      - Description: ${carData.description || 'N/A'}
+
+      Provide:
+      1. "fairPriceScore": exact string match of either "GREAT_DEAL", "FAIR_PRICE", or "OVERPRICED"
+      2. "marketAveragePrice": estimated number in KES
+      3. "demandScore": integer between 0 and 100 based on popularity in Kenya
+      4. "aiSummary": a short 2-sentence professional market valuation summary.
+    `;
+
+    try {
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: { type: 'json_object' },
+        temperature: 0.2,
+      });
+
+      return JSON.parse(response.choices[0].message.content || '{}');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error("OpenAI Generation Error:", errorMessage);
+      throw new Error("Failed to generate AI valuation.");
+    }
+  }
+
+  /**
+   * Main controller method used by AiController to analyze and upsert database intelligence
+   */
   async analyzeCarListing(carId: string) {
-    // 1. Fetch the car details from the database
+    // 1. Fetch the car details
     const car = await this.prisma.car.findUnique({
       where: { id: carId },
     });
@@ -23,7 +76,34 @@ export class AiService {
       throw new NotFoundException(`Car with ID ${carId} not found`);
     }
 
-    // 2. Draft an analytical context prompt optimized for market data evaluation
+    // 2. If no OpenAI key, return fallback data immediately
+    if (!this.openai) {
+      this.logger.warn(`Returning fallback AI data for car ${carId}`);
+      return this.prisma.listingIntelligence.upsert({
+        where: { carId: car.id },
+        update: {
+          fairPriceScore: 'FAIR_PRICE',
+          marketAveragePrice: car.price,
+          demandScore: 50,
+          aiSummary: 'AI analysis unavailable. Set OPENAI_API_KEY to enable smart valuations.',
+          priceHistory: {
+            updates: [{ timestamp: new Date().toISOString(), price: car.price }],
+          },
+        },
+        create: {
+          carId: car.id,
+          fairPriceScore: 'FAIR_PRICE',
+          marketAveragePrice: car.price,
+          demandScore: 50,
+          aiSummary: 'AI analysis unavailable. Set OPENAI_API_KEY to enable smart valuations.',
+          priceHistory: {
+            updates: [{ timestamp: new Date().toISOString(), price: car.price }],
+          },
+        },
+      });
+    }
+
+    // 3. Draft the prompt
     const prompt = `
       You are an expert automotive market analyst. Analyze the following vehicle listing details:
       - Make: ${car.make}
@@ -49,18 +129,16 @@ export class AiService {
     `;
 
     try {
-      // 3. Request a structured JSON completion from OpenAI
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini', // Cost-effective, high-speed model perfect for structured workflows
+        model: 'gpt-4o-mini',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
-        temperature: 0.2, // Kept low for consistent, data-driven analytical outputs
+        temperature: 0.2,
       });
 
       const result = JSON.parse(response.choices[0].message.content || '{}');
 
-      // 4. Save or update the intelligence profile in the database
-      const intelligence = await this.prisma.listingIntelligence.upsert({
+      return this.prisma.listingIntelligence.upsert({
         where: { carId: car.id },
         update: {
           fairPriceScore: result.fairPriceScore,
@@ -86,11 +164,33 @@ export class AiService {
           }
         },
       });
-
-      return intelligence;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`AI Engine failed to compute valuation: ${errorMessage}`);
+      this.logger.error(`AI Engine failed for car ${carId}: ${errorMessage}`);
+      
+      // Return fallback instead of crashing
+      return this.prisma.listingIntelligence.upsert({
+        where: { carId: car.id },
+        update: {
+          fairPriceScore: 'FAIR_PRICE',
+          marketAveragePrice: car.price,
+          demandScore: 50,
+          aiSummary: 'AI analysis temporarily unavailable.',
+          priceHistory: {
+            updates: [{ timestamp: new Date().toISOString(), price: car.price }],
+          },
+        },
+        create: {
+          carId: car.id,
+          fairPriceScore: 'FAIR_PRICE',
+          marketAveragePrice: car.price,
+          demandScore: 50,
+          aiSummary: 'AI analysis temporarily unavailable.',
+          priceHistory: {
+            updates: [{ timestamp: new Date().toISOString(), price: car.price }],
+          },
+        },
+      });
     }
   }
 }

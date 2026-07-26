@@ -8,7 +8,7 @@ export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-
+   
   // Check for token on mount and route changes
   useEffect(() => {
     // Check for the token key used in your login flow

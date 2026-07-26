@@ -98,4 +98,26 @@ export class CarsService {
     await this.prisma.car.delete({ where: { id } });
     return { message: 'Listing successfully removed' };
   }
+
+  async fixBrokenImages() {
+    const cars = await this.prisma.car.findMany();
+
+    let fixedCount = 0;
+
+    for (const car of cars) {
+      const hasBrokenImages = Array.isArray(car.images)
+        ? car.images.some((img: string) => img.includes('undefined'))
+        : false;
+
+      if (hasBrokenImages) {
+        await this.prisma.car.update({
+          where: { id: car.id },
+          data: { images: [] },
+        });
+        fixedCount += 1;
+      }
+    }
+
+    return { fixed: fixedCount };
+  }
 }

@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { apiRequest } from '../lib/api';
-import { useRouter } from 'next/navigation';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 interface Car {
   id: string;
@@ -21,11 +21,18 @@ interface Car {
   };
 }
 
+function resolveImageUrl(imagePath: string | undefined | null): string {
+  if (!imagePath) return '';
+  if (typeof imagePath !== 'string') return '';
+  if (imagePath === 'undefined' || imagePath.includes('/undefined')) return '';
+  if (imagePath.startsWith('http')) return imagePath;
+  return `${API_BASE_URL}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+}
+
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const [make, setMake] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
@@ -36,15 +43,24 @@ export default function CarsPage() {
   const fetchCars = async () => {
     try {
       setLoading(true);
+      setError(null);
 
       const params = new URLSearchParams();
-
       if (make) params.append('make', make);
       if (maxPrice) params.append('maxPrice', maxPrice);
 
       const query = params.toString() ? `?${params.toString()}` : '';
-
       const data = await apiRequest(`/cars${query}`);
+
+      // EXPANDED DEBUG — check your browser console
+      console.log('=== API RESPONSE ===');
+      console.log('Number of cars:', data?.length);
+      data?.forEach((car: Car, i: number) => {
+        console.log(`Car ${i} (${car.make} ${car.model}):`);
+        console.log('  images array:', car.images);
+        console.log('  images[0]:', car.images?.[0]);
+        console.log('  typeof images[0]:', typeof car.images?.[0]);
+      });
 
       setCars(data);
     } catch (err: any) {
@@ -74,7 +90,6 @@ export default function CarsPage() {
             onChange={(e) => setMake(e.target.value)}
             className="bg-neutral-900 border border-neutral-800 px-4 py-2.5 rounded-xl text-sm focus:outline-none focus:border-neutral-600"
           />
-
           <input
             type="number"
             placeholder="Max Budget (KES)"
@@ -104,65 +119,81 @@ export default function CarsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cars.map((car) => (
-              <Link
-                href={`/cars/${car.id}`}
-                key={car.id}
-                className="group bg-neutral-900/40 border border-neutral-800 rounded-2xl overflow-hidden hover:border-neutral-600 transition"
-              >
-                <div className="relative w-full h-48 bg-neutral-950 overflow-hidden">
-                  {car.images?.length > 0 ? (
-                    <img
-                      src={car.images[0]}
-                      alt={`${car.make} ${car.model}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-neutral-600">
-                      No Image Available
-                    </div>
-                  )}
+            {cars.map((car) => {
+              const rawImage = car.images?.[0];
+              const imageUrl = resolveImageUrl(rawImage);
+              const hasValidImage = !!imageUrl;
 
-                  {car.intelligence?.fairPriceScore && (
-                    <span
-                      className={`absolute top-4 right-4 text-[10px] font-bold px-2 py-1 rounded-full uppercase ${
-                        car.intelligence.fairPriceScore === 'GREAT_DEAL'
-                          ? 'bg-emerald-950 text-emerald-400'
-                          : 'bg-blue-950 text-blue-400'
-                      }`}
-                    >
-                      {car.intelligence.fairPriceScore.replace('_', ' ')}
-                    </span>
-                  )}
-                </div>
+              return (
+                <Link
+                  href={`/cars/${car.id}`}
+                  key={car.id}
+                  className="group bg-neutral-900/40 border border-neutral-800 rounded-2xl overflow-hidden hover:border-neutral-600 transition"
+                >
+                  <div className="relative w-full h-48 bg-neutral-950 overflow-hidden">
+                    {hasValidImage ? (
+                      <img
+                        src={imageUrl}
+                        alt={`${car.make} ${car.model}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          console.error('Image failed to load:', imageUrl);
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-neutral-600 text-sm">Image Failed to Load</div>';
+                          }
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-neutral-600 text-sm">
+                        <span>No Image Available</span>
+                        {rawImage && (
+                          <span className="text-[10px] text-neutral-700 mt-1 font-mono max-w-[90%] truncate">
+                            Raw: {String(rawImage)}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
-                <div className="p-6">
-                  <h3 className="text-xl font-bold">
-                    {car.make} {car.model}
-                  </h3>
-
-                  <p className="text-xs text-neutral-500 mb-4">
-                    {car.year} • {car.mileage.toLocaleString()} km
-                  </p>
-
-                  {car.intelligence?.aiSummary && (
-                    <p className="text-xs text-neutral-400 bg-neutral-950 p-3 rounded-lg mb-4 italic line-clamp-2">
-                      "{car.intelligence.aiSummary}"
-                    </p>
-                  )}
-
-                  <div className="flex justify-between items-center pt-4 border-t border-neutral-800">
-                    <span className="text-lg font-black">
-                      KES {car.price.toLocaleString()}
-                    </span>
-
-                    <span className="text-xs font-semibold bg-neutral-800 px-3 py-1.5 rounded-lg group-hover:bg-white group-hover:text-black transition">
-                      View
-                    </span>
+                    {car.intelligence?.fairPriceScore && (
+                      <span
+                        className={`absolute top-4 right-4 text-[10px] font-bold px-2 py-1 rounded-full uppercase ${
+                          car.intelligence.fairPriceScore === 'GREAT_DEAL'
+                            ? 'bg-emerald-950 text-emerald-400'
+                            : 'bg-blue-950 text-blue-400'
+                        }`}
+                      >
+                        {car.intelligence.fairPriceScore.replace('_', ' ')}
+                      </span>
+                    )}
                   </div>
-                </div>
-              </Link>
-            ))}
+
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold">
+                      {car.make} {car.model}
+                    </h3>
+                    <p className="text-xs text-neutral-500 mb-4">
+                      {car.year} &bull; {car.mileage.toLocaleString()} km
+                    </p>
+                    {car.intelligence?.aiSummary && (
+                      <p className="text-xs text-neutral-400 bg-neutral-950 p-3 rounded-lg mb-4 italic line-clamp-2">
+                        &ldquo;{car.intelligence.aiSummary}&rdquo;
+                      </p>
+                    )}
+                    <div className="flex justify-between items-center pt-4 border-t border-neutral-800">
+                      <span className="text-lg font-black">
+                        KES {car.price.toLocaleString()}
+                      </span>
+                      <span className="text-xs font-semibold bg-neutral-800 px-3 py-1.5 rounded-lg group-hover:bg-white group-hover:text-black transition">
+                        View
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

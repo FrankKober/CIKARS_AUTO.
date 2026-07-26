@@ -1,57 +1,88 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service.js';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
 
-  async register(body: any) {
-    const { email, password, name, role } = body;
+  async validateUser(email: string, password: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
-    const userExists = await this.prisma.user.findUnique({ where: { email } });
-    if (userExists) {
-      throw new ConflictException('Email already registered');
+    if (!user) {
+      this.logger.warn(`Login attempt for non-existent user: ${email}`);
+      return null;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    if (!user.password) {
+      this.logger.warn(`User ${email} has no password set`);
+      return null;
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      this.logger.warn(`Invalid password for user: ${email}`);
+      return null;
+    }
+
+    return user;
+  }
+
+  async login(email: string, password: string) {
+    const user = await this.validateUser(email, password);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const payload = { sub: user.id, email: user.email };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+    };
+  }
+
+  async register(email: string, password: string, name?: string) {
+    const existing = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existing) {
+      throw new UnauthorizedException('Email already registered');
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
 
     const user = await this.prisma.user.create({
       data: {
         email,
-        name,
-        password: hashedPassword,
-        role: role || 'BUYER',
+        password: hashed,
+        name: name ?? '',
       },
     });
 
-    return this.generateToken(user.id, user.email, user.role);
-  }
+    const payload = { sub: user.id, email: user.email };
 
-  async login(body: any) {
-    const { email, password } = body;
-
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    return this.generateToken(user.id, user.email, user.role);
-  }
-
-  private generateToken(userId: string, email: string, role: string) {
-    const payload = { sub: userId, email, role };
     return {
       access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name ?? '',
+      },
     };
   }
 }

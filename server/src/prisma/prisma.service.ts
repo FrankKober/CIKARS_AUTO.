@@ -1,29 +1,37 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
-  constructor() {
-    // Create a pool for the adapter
-    const pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-    });
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(PrismaService.name);
 
-    // Initialize the adapter
+  constructor() {
+    const connectionString = process.env.DATABASE_URL;
+
+    if (!connectionString) {
+      throw new Error('DATABASE_URL is not defined. Check your .env file.');
+    }
+
+    // Fix: Remove channel_binding (breaks pg driver) and ensure clean URL
+    const cleanUrl = connectionString
+      .replace(/&?channel_binding=[^&]*/g, '')
+      .replace(/\?&/, '?')
+      .replace(/\?$/, '');
+
+    const pool = new Pool({ connectionString: cleanUrl });
     const adapter = new PrismaPg(pool);
 
-    // Pass the adapter to the super constructor
     super({ adapter });
   }
 
   async onModuleInit() {
-    try {
-      await this.$connect();
-      console.log('Successfully connected to the database with Adapter!');
-    } catch (error) {
-      console.error('Failed to connect to the database:', error);
-    }
+    await this.$connect();
+    this.logger.log('Successfully connected to the database!');
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
   }
 }
