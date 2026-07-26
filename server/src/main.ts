@@ -13,15 +13,24 @@ async function bootstrap() {
     prefix: '/uploads',
   });
 
+  // 👇 PLACE THE UPDATED CORS CODE HERE IN main.ts
   app.enableCors({
-    origin: [
-      'https://cikars-auto-z3l8-2ncnrkmlg-676866s-projects.vercel.app', // Matches your current screenshot URL
-      'http://localhost:3000', // For local development testing if needed
-    ],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'https://cikars-auto.onrender.com',
+      ];
+      
+      // Allows any Vercel preview or production deployment automatically
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   });
 
-  // Use process.env.PORT provided by Render, fallback to 3001 locally
   const port = process.env.PORT || 3001;
   await app.listen(port);
   console.log(`Server running on port ${port}`);
