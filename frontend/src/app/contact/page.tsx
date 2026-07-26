@@ -37,43 +37,44 @@ export default function ContactPage() {
   };
 
   const offices = [
-    { city: 'Nairobi', address: '350 Fifth Avenue, Suite 4200', phone: '+254 794603876' },
-    { city: 'Mombasa', address: '1 Square, Canary Wharf', phone: '+254 794603876' },
-    { city: 'Kisumu', address: 'Burj Khalifa Blvd', phone: '+254 794603876' },
+    { city: 'Nairobi', address: 'Kimathi Street, Nairobi CBD', phone: '+254 794 603 876' },
+    { city: 'Mombasa', address: 'Moi Avenue, Mombasa Island', phone: '+254 794 603 876' },
+    { city: 'Kisumu', address: 'Oginga Odinga Road, Kisumu', phone: '+254 794 603 876' },
   ];
 
   return (
     <main className="relative min-h-screen bg-black text-white overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_65%)]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-[150px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_65%)] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-[150px] pointer-events-none" />
 
-      <div className="h-20" />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16">
+      {/* Navbar offset is handled by the global layout/navbar component, but added extra top padding here so content doesn't crash on mobile */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+        
         {/* Header */}
         <FadeIn>
           <div className="text-center mb-16">
             <p className="text-sm uppercase tracking-[0.3em] text-neutral-500 mb-4">Get in Touch</p>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter mb-6">
               Let's <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600">talk</span>
             </h1>
-            <p className="text-neutral-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            <p className="text-neutral-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed px-2">
               Have a question about a listing, need help selling your car, or just want to say hello? 
               We are here for you.
             </p>
           </div>
         </FadeIn>
 
-        <div className="grid lg:grid-cols-5 gap-12">
-          {/* Contact Info */}
+        <div className="grid lg:grid-cols-5 gap-8 lg:gap-12">
+          
+          {/* Contact Info (Stacked first on mobile or desktop layout) */}
           <FadeIn delay={100} className="lg:col-span-2">
             <div className="space-y-6">
-              <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-8">
+              <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-6 sm:p-8">
                 <h3 className="text-xl font-bold mb-6">Contact Info</h3>
                 <div className="space-y-5">
                   <div>
                     <p className="text-neutral-500 text-sm mb-1">Email</p>
-                    <Link href="mailto:franklinekpober@gmail.com" className="text-white hover:text-neutral-300 transition">franklinekpober@gmail.com</Link>
+                    <Link href="mailto:franklinekober@gmail.com" className="text-white hover:text-neutral-300 transition break-all">franklinekober@gmail.com</Link>
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm mb-1">Phone</p>
@@ -81,18 +82,18 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-neutral-500 text-sm mb-1">Support Hours</p>
-                    <p className="text-white">Mon – Fri, 9am – 8pm EST</p>
+                    <p className="text-white">Mon – Fri, 9am – 8pm EAT</p>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-8">
+              <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-6 sm:p-8">
                 <h3 className="text-xl font-bold mb-6">Follow Us</h3>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-3">
                   {['Twitter', 'Instagram', 'LinkedIn', 'YouTube'].map((social) => (
                     <button
                       key={social}
-                      className="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium hover:bg-white hover:text-black transition"
+                      className="px-4 py-2 rounded-full border border-white/10 bg-white/5 text-sm font-medium hover:bg-white hover:text-black transition cursor-pointer"
                     >
                       {social}
                     </button>
@@ -100,12 +101,12 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-8">
+              <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-6 sm:p-8">
                 <h3 className="text-xl font-bold mb-6">Press Inquiries</h3>
                 <p className="text-neutral-400 text-sm leading-relaxed mb-4">
                   For media requests, brand partnerships, and press kits.
                 </p>
-                <Link href="mailto:franklinekober@gmail.com" className="text-white font-medium hover:underline">
+                <Link href="mailto:franklinekober@gmail.com" className="text-white font-medium hover:underline break-all">
                   franklinekober@gmail.com
                 </Link>
               </div>
@@ -114,7 +115,7 @@ export default function ContactPage() {
 
           {/* Form */}
           <FadeIn delay={200} className="lg:col-span-3">
-            <div className="rounded-[32px] border border-white/10 bg-white/[0.03] backdrop-blur-xl p-8 md:p-12">
+            <div className="rounded-[32px] border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6 sm:p-8 md:p-12">
               {submitted ? (
                 <div className="text-center py-12">
                   <div className="text-5xl mb-4">✓</div>
@@ -152,14 +153,14 @@ export default function ContactPage() {
                     <select
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      className="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-white/30 transition appearance-none"
+                      className="w-full px-5 py-4 rounded-2xl bg-neutral-900 border border-white/10 text-white focus:outline-none focus:border-white/30 transition"
                     >
-                      <option value="" className="bg-black">Select a topic</option>
-                      <option value="general" className="bg-black">General Inquiry</option>
-                      <option value="support" className="bg-black">Customer Support</option>
-                      <option value="sell" className="bg-black">Selling a Car</option>
-                      <option value="partners" className="bg-black">Partnerships</option>
-                      <option value="press" className="bg-black">Press & Media</option>
+                      <option value="" className="bg-black text-neutral-400">Select a topic</option>
+                      <option value="general" className="bg-black text-white">General Inquiry</option>
+                      <option value="support" className="bg-black text-white">Customer Support</option>
+                      <option value="sell" className="bg-black text-white">Selling a Car</option>
+                      <option value="partners" className="bg-black text-white">Partnerships</option>
+                      <option value="press" className="bg-black text-white">Press & Media</option>
                     </select>
                   </div>
                   <div>
@@ -175,7 +176,7 @@ export default function ContactPage() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-4 rounded-full bg-white text-black font-bold hover:scale-[1.02] transition"
+                    className="w-full py-4 rounded-full bg-white text-black font-bold hover:scale-[1.02] transition cursor-pointer"
                   >
                     Send Message
                   </button>
@@ -187,15 +188,15 @@ export default function ContactPage() {
 
         {/* Offices */}
         <FadeIn delay={300}>
-          <div className="mt-24">
+          <div className="mt-20 md:mt-24">
             <div className="text-center mb-12">
               <p className="text-sm uppercase tracking-[0.3em] text-neutral-500 mb-4">Locations</p>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tighter">Our Offices</h2>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter">Our Offices</h2>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {offices.map((office, i) => (
                 <FadeIn key={office.city} delay={i * 100}>
-                  <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-8 hover:border-white/20 transition group">
+                  <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-6 sm:p-8 hover:border-white/20 transition group">
                     <h3 className="text-2xl font-black tracking-tighter mb-4">{office.city}</h3>
                     <div className="space-y-2 text-neutral-400 text-sm">
                       <p>{office.address}</p>
@@ -213,7 +214,7 @@ export default function ContactPage() {
 
         {/* FAQ Teaser */}
         <FadeIn delay={200}>
-          <div className="mt-24 text-center">
+          <div className="mt-20 md:mt-24 text-center pb-12">
             <p className="text-neutral-500 mb-4">Prefer self-service?</p>
             <Link href="#" className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-white/20 font-medium hover:bg-white hover:text-black transition">
               Visit our Help Center <span>→</span>
