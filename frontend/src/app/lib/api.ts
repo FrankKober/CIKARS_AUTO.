@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://cikars-auto-6bmw-6807bj288-676866s-projects.vercel.app/';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://cikars-auto.onrender.com';
 
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
