@@ -14,11 +14,16 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['https://cikars-auto-z3l8-1myb0rwfl-676866s-projects.vercel.app/'],
+    origin: [
+      'https://cikars-auto-z3l8-2ncnrkmlg-676866s-projects.vercel.app', // Matches your current screenshot URL
+      'http://localhost:3000', // For local development testing if needed
+    ],
     credentials: true,
   });
 
-  await app.listen(3001);
-  console.log(`Server running on https://cikars-auto.onrender.com`);
+  // Use process.env.PORT provided by Render, fallback to 3001 locally
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+  console.log(`Server running on port ${port}`);
 }
 bootstrap();
