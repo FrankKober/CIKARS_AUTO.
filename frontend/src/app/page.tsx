@@ -180,27 +180,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white font-sans">
       
-      {/* ===== NAVBAR ===== */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/50 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-black tracking-tighter">
-            CIKARS
-          </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
-            <Link href="/cars" className="hover:text-white transition">Browse</Link>
-            <Link href="/sell" className="hover:text-white transition">Sell</Link>
-            <Link href="/about" className="hover:text-white transition">About</Link>
-            <Link href="/careers" className="hover:text-white transition">Careers</Link>
-            <Link href="/contact" className="hover:text-white transition">Contact</Link>
-          </div>
-          <div className="flex items-center gap-4">
-            
-            <Link href="/auth" className="px-5 py-2.5 rounded-full bg-white text-black text-sm font-bold hover:scale-105 transition">
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </nav>
+      
 
       {/* ===== BACKGROUND EFFECTS ===== */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06)_0%,transparent_65%)]" />
