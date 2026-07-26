@@ -14,11 +14,11 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: ['https://cikars-auto.onrender.com'],
     credentials: true,
   });
 
   await app.listen(3001);
-  console.log(`Server running on http://localhost:3001`);
+  console.log(`Server running on https://cikars-auto.onrender.com`);
 }
 bootstrap();

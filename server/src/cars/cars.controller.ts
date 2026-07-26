@@ -60,7 +60,7 @@ export class CarsController {
     console.log('First file:', files?.[0]);
     console.log('Body:', body);
 
-    const BASE_URL = process.env.BACKEND_URL || 'http://localhost:3001';
+    const BASE_URL = process.env.BACKEND_URL || 'https://cikars-auto.onrender.com';
     
     // Safe mapping with null checks
     const imageUrls = (files || []).map((file, i) => {
