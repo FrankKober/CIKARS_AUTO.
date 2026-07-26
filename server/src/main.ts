@@ -14,7 +14,7 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ['https://cikars-auto.onrender.com'],
+    origin: ['https://cikars-auto-z3l8-1myb0rwfl-676866s-projects.vercel.app/'],
     credentials: true,
   });
 
