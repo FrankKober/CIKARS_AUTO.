@@ -25,6 +25,12 @@ function resolveImageUrl(imagePath: string | undefined | null): string {
   if (!imagePath) return '';
   if (typeof imagePath !== 'string') return '';
   if (imagePath === 'undefined' || imagePath.includes('/undefined')) return '';
+  
+  // Automatically rewrite localhost URLs to use the live production backend URL
+  if (imagePath.includes('localhost:3001')) {
+    return imagePath.replace('http://localhost:3001', API_BASE_URL);
+  }
+
   if (imagePath.startsWith('http')) return imagePath;
   return `${API_BASE_URL}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
 }
@@ -52,7 +58,6 @@ export default function CarsPage() {
       const query = params.toString() ? `?${params.toString()}` : '';
       const data = await apiRequest(`/cars${query}`);
 
-      // EXPANDED DEBUG — check your browser console
       console.log('=== API RESPONSE ===');
       console.log('Number of cars:', data?.length);
       data?.forEach((car: Car, i: number) => {

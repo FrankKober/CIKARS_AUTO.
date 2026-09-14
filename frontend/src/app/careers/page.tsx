@@ -48,7 +48,7 @@ export default function CareersPage() {
   return (
     <main className="relative min-h-screen bg-black text-white overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_65%)]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-[150px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-150 h-150 bg-white/5 rounded-full blur-[150px]" />
 
       <div className="h-20" />
 
@@ -59,7 +59,7 @@ export default function CareersPage() {
             <p className="text-sm uppercase tracking-[0.3em] text-neutral-500 mb-4">Join Us</p>
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6">
               Build the future <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600">of mobility</span>
+              <span className="text-transparent bg-clip-text bg-linear-to-b from-white to-neutral-600">of mobility</span>
             </h1>
             <p className="text-neutral-400 text-lg max-w-2xl mx-auto leading-relaxed">
               We are a team of builders, designers, and car obsessives on a mission to transform 
@@ -73,7 +73,7 @@ export default function CareersPage() {
 
         {/* Culture */}
         <FadeIn delay={100}>
-          <div className="rounded-[40px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] backdrop-blur-xl p-12 md:p-16 mb-24 text-center">
+          <div className="rounded-[40px] border border-white/10 bg-linear-to-b from-white/6 to-white/2 backdrop-blur-xl p-12 md:p-16 mb-24 text-center">
             <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-6">Our Culture</h2>
             <p className="text-neutral-400 text-lg max-w-3xl mx-auto leading-relaxed">
               We move fast, think big, and obsess over the details. At Cikars, you will work alongside 
@@ -93,7 +93,7 @@ export default function CareersPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
           {benefits.map((b, i) => (
             <FadeIn key={b.title} delay={i * 100}>
-              <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-8 hover:bg-white/[0.06] transition group">
+              <div className="rounded-3xl border border-white/10 bg-white/3 backdrop-blur-lg p-8 hover:bg-white/6 transition group">
                 <div className="text-4xl mb-4 opacity-60 group-hover:opacity-100 transition">{b.icon}</div>
                 <h3 className="text-xl font-bold mb-2">{b.title}</h3>
                 <p className="text-neutral-400 text-sm leading-relaxed">{b.desc}</p>
@@ -112,7 +112,7 @@ export default function CareersPage() {
         <div className="space-y-4">
           {openings.map((job, i) => (
             <FadeIn key={job.title} delay={i * 80}>
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-6 md:p-8 hover:border-white/20 transition group">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border border-white/10 bg-white/3 backdrop-blur-lg p-6 md:p-8 hover:border-white/20 transition group">
                 <div>
                   <h3 className="text-xl font-bold mb-1 group-hover:text-neutral-300 transition">{job.title}</h3>
                   <div className="flex flex-wrap gap-3 text-sm text-neutral-500">

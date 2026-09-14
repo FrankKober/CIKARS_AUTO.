@@ -11,6 +11,7 @@ export default function SellCarPage() {
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
+  const [imageUrlInput, setImageUrlInput] = useState<string>(''); 
   const [previews, setPreviews] = useState<string[]>([]);
   const [submittedImages, setSubmittedImages] = useState<string[]>([]);
 
@@ -28,10 +29,23 @@ export default function SellCarPage() {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files);
       setFiles(selectedFiles);
+      setImageUrlInput(''); 
       
-      // Generate previews
       const newPreviews = selectedFiles.map(file => URL.createObjectURL(file));
       setPreviews(newPreviews);
+    }
+  };
+
+  const handleUrlInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setImageUrlInput(val);
+    
+    if (val.trim()) {
+      setFiles([]);
+      const urls = val.split(/[\s,]+/).filter(Boolean);
+      setPreviews(urls);
+    } else {
+      setPreviews([]);
     }
   };
 
@@ -40,6 +54,9 @@ export default function SellCarPage() {
     const newPreviews = previews.filter((_, i) => i !== index);
     setFiles(newFiles);
     setPreviews(newPreviews);
+    if (files.length === 0) {
+      setImageUrlInput('');
+    }
   };
 
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
@@ -50,7 +67,6 @@ export default function SellCarPage() {
     setLoading(true);
     setError(null);
 
-    // ─── TOKEN EXTRACTION ───
     let token: string | null = null;
     const authData = localStorage.getItem('tasky-auth');
 
@@ -58,17 +74,16 @@ export default function SellCarPage() {
       try {
         const parsed = JSON.parse(authData);
         token = parsed.state?.token 
-             || parsed.token 
-             || parsed.data?.token 
-             || parsed.user?.token 
-             || parsed.accessToken 
-             || null;
+              || parsed.token 
+              || parsed.data?.token 
+              || parsed.user?.token 
+              || parsed.accessToken 
+              || null;
       } catch (e) {
         console.error('Auth parsing error:', e);
       }
     }
 
-    // Fallback keys
     if (!token) {
       const fallbacks = ['token', 'access_token', 'auth_token', 'jwt', 'user'];
       for (const key of fallbacks) {
@@ -86,7 +101,6 @@ export default function SellCarPage() {
       }
     }
 
-    // Cookie fallback
     if (!token) {
       const match = document.cookie.match(/(?:^|; )token=([^;]*)/);
       if (match) token = decodeURIComponent(match[1]);
@@ -98,13 +112,18 @@ export default function SellCarPage() {
       return;
     }
 
-    // ─── FORM SUBMISSION ───
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (value) data.append(key, value.toString());
     });
 
-    files.forEach((file) => data.append('images', file));
+    if (files.length > 0) {
+      files.forEach((file) => data.append('images', file));
+    } else if (imageUrlInput.trim()) {
+      // Fixed: Append URLs under 'images' instead of 'imageUrls' so backend catches them
+      const urls = imageUrlInput.split(/[\s,]+/).filter(Boolean);
+      urls.forEach((url) => data.append('images', url));
+    }
 
     try {
       const response = await fetch('https://cikars-auto.onrender.com/cars', {
@@ -127,7 +146,6 @@ export default function SellCarPage() {
       const result = await response.json();
       console.log('Server response:', result);
 
-      // Store returned image URLs to display them
       if (result.images && Array.isArray(result.images)) {
         setSubmittedImages(result.images);
       }
@@ -177,7 +195,6 @@ export default function SellCarPage() {
         <form onSubmit={handleSubmit} className="bg-neutral-900/50 border border-neutral-800 rounded-3xl p-8 backdrop-blur-xl">
           {error && <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl">{error}</div>}
 
-          {/* SUCCESS STATE - Show uploaded images */}
           {submittedImages.length > 0 && (
             <div className="mb-6 p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
               <h3 className="text-emerald-400 font-bold mb-3">✓ Listing Published Successfully!</h3>
@@ -185,10 +202,10 @@ export default function SellCarPage() {
               <div className="grid grid-cols-3 gap-3">
                 {submittedImages.map((img, i) => (
                   <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-emerald-500/30">
-                    <Image 
-                      src={img} 
-                      alt={`Uploaded ${i + 1}`} 
-                      fill 
+                    <Image
+                      src={img}
+                      alt={`${formData.make || 'Car'} ${formData.model || 'Image'}`}
+                      fill
                       className="object-cover"
                       unoptimized
                     />
@@ -222,7 +239,6 @@ export default function SellCarPage() {
               <div className="space-y-6">
                 <input name="location" placeholder="Location (e.g. Nairobi)" value={formData.location} onChange={handleChange} className="w-full p-4 bg-black border border-neutral-800 rounded-xl focus:border-white outline-none transition" required />
                 
-                {/* File Upload Area */}
                 <div className="border-2 border-dashed border-neutral-800 rounded-2xl p-8 text-center hover:border-neutral-600 transition">
                   <input 
                     type="file" 
@@ -242,10 +258,29 @@ export default function SellCarPage() {
                   )}
                 </div>
 
-                {/* Image Previews */}
+                <div className="flex items-center my-4">
+                  <div className="grow border-t border-neutral-800"></div>
+                  <span className="mx-4 text-xs text-neutral-500 uppercase tracking-widest">Or use image link</span>
+                  <div className="grow border-t border-neutral-800"></div>
+                </div>
+
+                <div>
+                  <input 
+                    type="text"
+                    placeholder="Paste image URL(s) separated by commas"
+                    value={imageUrlInput}
+                    onChange={handleUrlInputChange}
+                    disabled={files.length > 0}
+                    className="w-full p-4 bg-black border border-neutral-800 rounded-xl focus:border-white outline-none transition disabled:opacity-40"
+                  />
+                  {files.length > 0 && (
+                    <p className="text-xs text-neutral-500 mt-1">Clear uploaded files to use image URLs instead.</p>
+                  )}
+                </div>
+
                 {previews.length > 0 && (
                   <div>
-                    <p className="text-sm text-neutral-500 mb-3">Selected Images:</p>
+                    <p className="text-sm text-neutral-500 mb-3">Selected Images Preview:</p>
                     <div className="grid grid-cols-4 gap-3">
                       {previews.map((preview, i) => (
                         <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-neutral-700 group">
@@ -282,12 +317,11 @@ export default function SellCarPage() {
                   required 
                 />
                 
-                {/* Review summary */}
                 <div className="p-6 bg-white/5 border border-white/10 rounded-xl space-y-2 text-sm">
                   <p><span className="text-neutral-500">Vehicle:</span> {formData.make} {formData.model} ({formData.year})</p>
                   <p><span className="text-neutral-500">Price:</span> KES {formData.price}</p>
                   <p><span className="text-neutral-500">Location:</span> {formData.location}</p>
-                  <p><span className="text-neutral-500">Photos:</span> {files.length} image(s)</p>
+                  <p><span className="text-neutral-500">Photos:</span> {files.length > 0 ? `${files.length} file(s)` : imageUrlInput ? 'Provided via URL' : 'None'}</p>
                 </div>
               </div>
             )}

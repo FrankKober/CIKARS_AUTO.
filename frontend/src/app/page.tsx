@@ -64,7 +64,7 @@ function FadeIn({ children, delay = 0, className = '' }: { children: React.React
 // --- Featured Car Card ---
 function CarCard({ image, title, price, year, mileage, tag }: { image: string; title: string; price: string; year: string; mileage: string; tag?: string }) {
   return (
-    <div className="group relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg overflow-hidden hover:border-white/20 transition-all duration-500 hover:-translate-y-1">
+    <div className="group relative rounded-3xl border border-white/10 bg-white/3 backdrop-blur-lg overflow-hidden hover:border-white/20 transition-all duration-500 hover:-translate-y-1">
       {tag && (
         <span className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-white text-black text-xs font-bold uppercase tracking-wider">
           {tag}
@@ -78,7 +78,7 @@ function CarCard({ image, title, price, year, mileage, tag }: { image: string; t
           className="object-cover group-hover:scale-110 transition-transform duration-700"
           unoptimized
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
       </div>
       <div className="p-6">
         <h3 className="text-lg font-bold mb-1">{title}</h3>
@@ -97,7 +97,7 @@ function CarCard({ image, title, price, year, mileage, tag }: { image: string; t
 // --- Testimonial Card ---
 function Testimonial({ name, role, quote, avatar }: { name: string; role: string; quote: string; avatar: string }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-8 hover:bg-white/[0.06] transition">
+    <div className="rounded-3xl border border-white/10 bg-white/3 backdrop-blur-lg p-8 hover:bg-white/6 transition">
       <div className="flex items-center gap-4 mb-6">
         <div className="relative w-12 h-12 rounded-full overflow-hidden border border-white/20">
           <Image src={avatar} alt={name} fill className="object-cover" unoptimized />
@@ -184,7 +184,7 @@ export default function Home() {
 
       {/* ===== BACKGROUND EFFECTS ===== */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06)_0%,transparent_65%)]" />
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-white/5 rounded-full blur-[150px]" />
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-175 h-175 bg-white/5 rounded-full blur-[150px]" />
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.02),transparent)]" />
 
      
@@ -200,7 +200,7 @@ export default function Home() {
           </div>
         </FadeIn>
          {/* Floating Car Images */}
-      <div className="hidden xl:block absolute left-[-6%] top-[45%] -translate-y-1/2 w-[420px] h-[320px] opacity-70 hover:opacity-100 transition-opacity duration-500">
+      <div className="hidden xl:block absolute left-[-6%] top-[45%] -translate-y-1/2 w-105 h-80 opacity-70 hover:opacity-100 transition-opacity duration-500">
         <Image
           src="https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=1200&auto=format&fit=crop"
           alt="Luxury Car"
@@ -209,7 +209,7 @@ export default function Home() {
           unoptimized
         />
       </div>
-      <div className="hidden xl:block absolute right-[-6%] top-[45%] -translate-y-1/2 w-[420px] h-[320px] opacity-70 hover:opacity-100 transition-opacity duration-500">
+      <div className="hidden xl:block absolute right-[-6%] top-[45%] -translate-y-1/2 w-105 h-80 opacity-70 hover:opacity-100 transition-opacity duration-500">
         <Image
           src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?q=80&w=1200&auto=format&fit=crop"
           alt="Sports Car"
@@ -223,7 +223,7 @@ export default function Home() {
           <h1 className="text-center text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter leading-[0.9]">
             Find your
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600">
+            <span className="text-transparent bg-clip-text bg-linear-to-b from-white to-neutral-600">
               Drive
             </span>
           </h1>
@@ -286,7 +286,7 @@ export default function Home() {
 
         {/* Search Box */}
         <FadeIn delay={600} className="w-full max-w-4xl mt-16">
-          <div className="rounded-[32px] border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-[0_0_60px_rgba(255,255,255,0.04)]">
+          <div className="rounded-4xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 shadow-[0_0_60px_rgba(255,255,255,0.04)]">
             <AnimatedSearch />
           </div>
         </FadeIn>
@@ -325,7 +325,7 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-8">
           {steps.map((step, i) => (
             <FadeIn key={step.num} delay={i * 150}>
-              <div className="relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-10 hover:bg-white/[0.06] transition group">
+              <div className="relative rounded-3xl border border-white/10 bg-white/3 backdrop-blur-lg p-10 hover:bg-white/6 transition group">
                 <span className="text-6xl font-black text-white/5 group-hover:text-white/10 transition absolute top-6 right-6">
                   {step.num}
                 </span>
@@ -369,7 +369,7 @@ export default function Home() {
             { title: '24/7 Support', desc: 'Our concierge team is available around the clock to help with any questions.', icon: '💬' },
           ].map((feature, i) => (
             <FadeIn key={feature.title} delay={i * 100}>
-              <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg p-8 hover:border-white/20 transition group">
+              <div className="rounded-3xl border border-white/10 bg-white/3 backdrop-blur-lg p-8 hover:border-white/20 transition group">
                 <div className="text-3xl mb-4 opacity-60 group-hover:opacity-100 transition">{feature.icon}</div>
                 <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
                 <p className="text-neutral-400 leading-relaxed">{feature.desc}</p>
@@ -399,7 +399,7 @@ export default function Home() {
       {/* ===== CTA / NEWSLETTER ===== */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 py-24">
         <FadeIn>
-          <div className="rounded-[40px] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-xl p-12 md:p-16 text-center">
+          <div className="rounded-[40px] border border-white/10 bg-linear-to-b from-white/8 to-white/2 backdrop-blur-xl p-12 md:p-16 text-center">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">
               Ready to find your<br />perfect drive?
             </h2>

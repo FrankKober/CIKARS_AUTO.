@@ -93,7 +93,7 @@ export default function BlogPage() {
   return (
     <main className="relative min-h-screen bg-black text-white overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_65%)]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-[150px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-150 h-150 bg-white/5 rounded-full blur-[150px]" />
 
       <div className="h-20" />
 
@@ -127,9 +127,9 @@ export default function BlogPage() {
         <FadeIn delay={150}>
           <div className="mb-16">
             <p className="text-sm uppercase tracking-[0.3em] text-neutral-500 mb-4">Featured</p>
-            <Link href="#" className="group block rounded-[32px] border border-white/10 bg-white/[0.03] backdrop-blur-lg overflow-hidden hover:border-white/20 transition">
+            <Link href="#" className="group block rounded-4xl border border-white/10 bg-white/3 backdrop-blur-lg overflow-hidden hover:border-white/20 transition">
               <div className="grid md:grid-cols-2">
-                <div className="relative h-64 md:h-auto min-h-[320px]">
+                <div className="relative h-64 md:h-auto min-h-80 bg-neutral-950 overflow-hidden">
                   <Image src={featured.image} alt={featured.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" unoptimized />
                 </div>
                 <div className="p-8 md:p-12 flex flex-col justify-center">
@@ -155,7 +155,7 @@ export default function BlogPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post, i) => (
             <FadeIn key={post.title} delay={i * 100}>
-              <Link href="#" className="group block rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-lg overflow-hidden hover:border-white/20 transition h-full">
+              <Link href="#" className="group block rounded-3xl border border-white/10 bg-white/3 backdrop-blur-lg overflow-hidden hover:border-white/20 transition h-full">
                 <div className="relative h-52 overflow-hidden">
                   <Image
                     src={post.image}
@@ -164,7 +164,7 @@ export default function BlogPage() {
                     className="object-cover group-hover:scale-110 transition-transform duration-700"
                     unoptimized
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                   <span className="absolute bottom-4 left-4 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-bold uppercase tracking-wider">
                     {post.category}
                   </span>
@@ -189,7 +189,7 @@ export default function BlogPage() {
 
         {/* Newsletter */}
         <FadeIn delay={200}>
-          <div className="mt-24 rounded-[40px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-white/[0.02] backdrop-blur-xl p-12 md:p-16 text-center">
+          <div className="mt-24 rounded-[40px] border border-white/10 bg-linear-to-b from-white/6 to-white/2 backdrop-blur-xl p-12 md:p-16 text-center">
             <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-4">Never Miss a Story</h2>
             <p className="text-neutral-400 mb-8 max-w-md mx-auto">
               Get our best articles delivered to your inbox every week. No spam, just cars.

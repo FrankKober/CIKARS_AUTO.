@@ -9,9 +9,12 @@ const nextConfig = {
         port: '3001',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cikars-auto.onrender.com',
+        pathname: '/uploads/**',
+      },
     ],
-    // OR just disable optimization for dev:
-    // unoptimized: true,
   },
 };
 
